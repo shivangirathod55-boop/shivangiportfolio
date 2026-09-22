@@ -1,0 +1,245 @@
+/* =========================================================
+   SHIVANGI PORTFOLIO
+   Simple beginner-friendly JavaScript
+========================================================= */
+
+document.addEventListener("DOMContentLoaded", () => {
+
+    /* =====================================================
+       1. MOBILE NAVIGATION
+    ===================================================== */
+
+    const menuToggle = document.querySelector(".menu-toggle");
+    const navLinks = document.querySelector(".nav-links");
+    const navigationLinks = document.querySelectorAll(".nav-links a");
+
+
+    function openMenu() {
+        navLinks.classList.add("active");
+        menuToggle.setAttribute("aria-expanded", "true");
+        menuToggle.setAttribute("aria-label", "Close navigation menu");
+    }
+
+
+    function closeMenu() {
+        navLinks.classList.remove("active");
+        menuToggle.setAttribute("aria-expanded", "false");
+        menuToggle.setAttribute("aria-label", "Open navigation menu");
+    }
+
+
+    if (menuToggle && navLinks) {
+
+        menuToggle.addEventListener("click", () => {
+
+            const isOpen = navLinks.classList.contains("active");
+
+            if (isOpen) {
+                closeMenu();
+            } else {
+                openMenu();
+            }
+
+        });
+
+
+        /* Close menu when a navigation link is selected */
+
+        navigationLinks.forEach((link) => {
+
+            link.addEventListener("click", () => {
+                closeMenu();
+            });
+
+        });
+
+
+        /* Close menu if the user taps outside it */
+
+        document.addEventListener("click", (event) => {
+
+            const clickedInsideMenu =
+                navLinks.contains(event.target);
+
+            const clickedMenuButton =
+                menuToggle.contains(event.target);
+
+            if (
+                navLinks.classList.contains("active") &&
+                !clickedInsideMenu &&
+                !clickedMenuButton
+            ) {
+                closeMenu();
+            }
+
+        });
+
+    }
+
+
+    /* =====================================================
+       2. ACTIVE NAVIGATION HIGHLIGHTING
+    ===================================================== */
+
+    const sections = document.querySelectorAll("main section[id]");
+
+
+    function updateActiveNavigation() {
+
+        let currentSection = "";
+
+        const scrollPosition = window.scrollY + 140;
+
+
+        sections.forEach((section) => {
+
+            const sectionTop = section.offsetTop;
+            const sectionHeight = section.offsetHeight;
+
+            if (
+                scrollPosition >= sectionTop &&
+                scrollPosition < sectionTop + sectionHeight
+            ) {
+                currentSection = section.getAttribute("id");
+            }
+
+        });
+
+
+        navigationLinks.forEach((link) => {
+
+            const linkTarget = link.getAttribute("href");
+
+            if (linkTarget === `#${currentSection}`) {
+                link.classList.add("active");
+            } else {
+                link.classList.remove("active");
+            }
+
+        });
+
+    }
+
+
+    window.addEventListener(
+        "scroll",
+        updateActiveNavigation,
+        { passive: true }
+    );
+
+
+    updateActiveNavigation();
+
+
+    /* =====================================================
+       3. SIMPLE SCROLL REVEAL
+    ===================================================== */
+
+    const revealElements = document.querySelectorAll(
+        ".section-heading, " +
+        ".about-card, " +
+        ".education-card, " +
+        ".interest-card, " +
+        ".strength-card, " +
+        ".goal-card, " +
+        ".contact-card"
+    );
+
+
+    /*
+        Add a small reveal style directly through JavaScript.
+
+        The website still works normally if JavaScript
+        does not load because these elements are visible
+        by default.
+    */
+
+    revealElements.forEach((element) => {
+
+        element.style.opacity = "0";
+        element.style.transform = "translateY(20px)";
+        element.style.transition =
+            "opacity 0.6s ease, transform 0.6s ease";
+
+    });
+
+
+    if ("IntersectionObserver" in window) {
+
+        const revealObserver = new IntersectionObserver(
+            (entries, observer) => {
+
+                entries.forEach((entry) => {
+
+                    if (entry.isIntersecting) {
+
+                        entry.target.style.opacity = "1";
+                        entry.target.style.transform =
+                            "translateY(0)";
+
+                        observer.unobserve(entry.target);
+
+                    }
+
+                });
+
+            },
+            {
+                threshold: 0.12
+            }
+        );
+
+
+        revealElements.forEach((element) => {
+            revealObserver.observe(element);
+        });
+
+    } else {
+
+        /*
+            Older browsers that do not support
+            IntersectionObserver simply show everything.
+        */
+
+        revealElements.forEach((element) => {
+
+            element.style.opacity = "1";
+            element.style.transform = "translateY(0)";
+
+        });
+
+    }
+
+
+    /* =====================================================
+       4. CURRENT YEAR
+    ===================================================== */
+
+    const currentYear = document.getElementById("current-year");
+
+
+    if (currentYear) {
+        currentYear.textContent = new Date().getFullYear();
+    }
+
+
+    /* =====================================================
+       5. KEYBOARD ACCESSIBILITY
+    ===================================================== */
+
+    document.addEventListener("keydown", (event) => {
+
+        if (event.key === "Escape") {
+
+            if (
+                navLinks &&
+                navLinks.classList.contains("active")
+            ) {
+                closeMenu();
+            }
+
+        }
+
+    });
+
+});
